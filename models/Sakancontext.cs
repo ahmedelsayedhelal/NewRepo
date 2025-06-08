@@ -9,6 +9,7 @@ namespace Sakan_project.models
         public DbSet<Owners> Owners { get; set; }
         public DbSet<Students> Students { get; set; }
 
+        public DbSet <Apartments> Apartments { get; set; }
         public DbSet<Universities> Universities { get; set; }
 
         public DbSet<Colleges> Colleges { get; set; }

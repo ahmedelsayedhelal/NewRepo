@@ -16,12 +16,20 @@ var builder = WebApplication.CreateBuilder(args);
 // 🔹 1. إضافة الخدمات إلى الحاوية (Container)
 
 // 📌 تكوين `DbContext`
-builder.Services.AddDbContext<Sakancontext>();
+// Replace the existing AddDbContext line with this:
+builder.Services.AddDbContext<Sakancontext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IOwnerRepository, Ownerrepository>();
+builder.Services.AddScoped<IApartmentReposatory, Apartmentreposaitory>();
 
 // 📌 إعداد الهوية (Identity)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<Sakancontext>()
     .AddDefaultTokenProviders();
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+    options.TokenLifespan = TimeSpan.FromMinutes(10));
+
 
 builder.Services.AddTransient<IEmailService, EmailService>();
 
@@ -45,7 +53,6 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWT:Secret"]))
     };
 });
-
 // 📌 تفعيل CORS
 builder.Services.AddCors(corsOptions =>
 {
@@ -57,6 +64,8 @@ builder.Services.AddCors(corsOptions =>
 
 // 📌 إضافة التحكم في الـ API
 builder.Services.AddControllers();
+
+builder.Services.AddEndpointsApiExplorer();
 
 // 📌 إعداد Swagger لتوثيق API
 builder.Services.AddSwaggerGen(swagger =>
@@ -113,6 +122,7 @@ using (var scope = app.Services.CreateScope())
 
 
 
+
 // 🔹 3. تهيئة الـ Middleware (الأنابيب)
 if (app.Environment.IsDevelopment())
 {
@@ -120,6 +130,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo v1"));
 }
+app.UseDeveloperExceptionPage();
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Demo v1"));
+
+
 
 // 📌 دعم الملفات الثابتة (Static Files)
 app.UseStaticFiles();

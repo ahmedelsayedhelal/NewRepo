@@ -11,21 +11,21 @@ namespace Sakan_project.Controllers
     [ApiController]
     public class OwnersController : ControllerBase
     {
-        IOwnerRepository OwnerRepository;
+        private readonly IOwnerRepository OwnerRepository;
         public OwnersController(IOwnerRepository OwnerRepository)
         {
             this.OwnerRepository = OwnerRepository;
         }
 
         [HttpGet]
-        public IActionResult getall()
+        public IActionResult Getall()
         {
             List<Owners> newOwner = OwnerRepository.GetAll();
-            ;
+
 
             return Ok(newOwner);
         }
-        [HttpGet("id")]
+        [HttpGet("{id}")]
 
         public IActionResult getbyid(int id)
         {
@@ -45,10 +45,10 @@ namespace Sakan_project.Controllers
             {
 
                 Ownersdto newOwner = new Ownersdto();
-                //if (newOwnerdto == null)
-                //{
-                //    return BadRequest("Product data is null");
-                //}
+                if (newOwnerdto == null)
+                {
+                    return BadRequest("Product data is null");
+                }
 
                 Owners newowner = new Owners
                 {
@@ -65,15 +65,67 @@ namespace Sakan_project.Controllers
             return BadRequest(ModelState);
 
         }
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Ownersdto ownersdto)
+        {
+            if (ModelState.IsValid == true)
+            {
+                Owners existingOwner = OwnerRepository.GetById(id);
+                if (existingOwner == null)
+                {
+                    return NotFound($"Owner with ID {id} not found.");
+                }
+
+                existingOwner.Firstname = ownersdto.fName;
+                existingOwner.Lastname = ownersdto.lname;
+                existingOwner.Email = ownersdto.Emaildto;
+
+                OwnerRepository.Edit(id, existingOwner);
+
+                return Ok("Updated successfully");
+            }
+            return BadRequest(ModelState);
+        }
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            try
+            {
+                // Check if owner exists
+                var owner = OwnerRepository.GetById(id);
+                if (owner == null)
+                {
+                    return NotFound(new
+                    {
+                        Message = $"Owner with ID {id} not found",
+                        StatusCode = 404
+                    });
+                }
+
+
+                OwnerRepository.Delete(id);
+
+                return Ok(new
+                {
+                    Message = $"Owner with ID {id} deleted successfully",
+                    StatusCode = 200
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    Message = "An error occurred while deleting the owner",
+                    Error = ex.Message,
+                    StatusCode = 500
+                });
+            }
+        }
     }
 }
-        //public IActionResult update(Owners newOwner)
-        //{
 
 
-        //}
 
-            
-    
+
 
 
