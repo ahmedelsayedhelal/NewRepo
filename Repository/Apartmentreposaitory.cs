@@ -40,6 +40,28 @@ namespace Sakan_project.Repository
             context.Apartments.Remove(oldDept);
             context.SaveChanges();
         }
+        public List<Apartments> SearchByName(string name)
+        {
+            return context.Apartments
+                .Where(a => a.Title.Contains(name))
+                .ToList();
+        }
+        public List<Apartments> FilterByPrice(decimal? minPrice, decimal? maxPrice)
+        {
+            var query = context.Apartments.AsQueryable();
+
+            if (minPrice.HasValue)
+            {
+                query = query.Where(a => a.PricePerMonth >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(a => a.PricePerMonth <= maxPrice.Value);
+            }
+
+            return query.ToList();
+        }
     }
 }
 

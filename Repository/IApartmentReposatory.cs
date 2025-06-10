@@ -9,5 +9,9 @@ namespace Sakan_project.Repository
         void Insert(Apartments item);
         void Edit(int id, Apartments item);
         void Delete(int id);
+        public List<Apartments> SearchByName(string name);
+        public List<Apartments> FilterByPrice(decimal? minPrice, decimal? maxPrice);
+
+
     }
 }

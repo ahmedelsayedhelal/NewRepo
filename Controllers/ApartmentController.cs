@@ -130,6 +130,39 @@ namespace Sakan_project.Controllers
                 });
             }
         }
+        [HttpGet("search")]
+        public IActionResult SearchByName([FromQuery] string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return BadRequest("Name parameter is required");
+            }
+
+            var apartments = ApartmentRepository.GetAll()
+                .Where(a => a.Title.Contains(name, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            return Ok(apartments);
+        }
+        [HttpGet("filter")]
+        public IActionResult FilterByPrice([FromQuery] decimal? minPrice, [FromQuery] decimal? maxPrice)
+        {
+            var apartments = ApartmentRepository.GetAll().AsQueryable();
+
+            if (minPrice.HasValue)
+            {
+                apartments = apartments.Where(a => a.PricePerMonth >= minPrice.Value);
+            }
+
+            if (maxPrice.HasValue)
+            {
+                apartments = apartments.Where(a => a.PricePerMonth <= maxPrice.Value);
+            }
+
+            return Ok(apartments.ToList());
+        }
+
+
     }
 }
 
