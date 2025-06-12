@@ -22,6 +22,7 @@ builder.Services.AddDbContext<Sakancontext>(options =>
 
 builder.Services.AddScoped<IOwnerRepository, Ownerrepository>();
 builder.Services.AddScoped<IApartmentReposatory, Apartmentreposaitory>();
+builder.Services.AddScoped<ICollegeRepository, CollegeRepository>();
 
 // 📌 إعداد الهوية (Identity)
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
